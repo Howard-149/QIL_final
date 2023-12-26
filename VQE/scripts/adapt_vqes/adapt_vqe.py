@@ -28,19 +28,19 @@ if __name__ == "__main__":
     r = 1.316
     # theta = 0.538*numpy.pi # for H20
     frozen_els = {'occupied': [], 'unoccupied': []}
-    molecule = BeH2(r=r)  # (frozen_els=frozen_els)
+    molecule = BeH2()  # (frozen_els=frozen_els)
 
     # <<<<<<<<<< ANSATZ ELEMENT POOL PARAMETERS >>>>>>>>>>>>.
-    # ansatz_element_type = 'eff_f_exc'
-    ansatz_element_type = 'q_exc'
+    ansatz_element_type = 'eff_f_exc'
+    # ansatz_element_type = 'q_exc'
     # ansatz_element_type = 'f_exc'
-    ansatz_element_type = 'pauli_str_exc'
+    # ansatz_element_type = 'pauli_str_exc'
     q_encoding = 'jw'
     spin_complement = False  # only for fermionic and qubit excitations (not for PWEs)
 
     # <<<<<<<<<< TERMINATION PARAMETERS >>>>>>>>>>>>>>>>>
-    delta_e_threshold = 1e-12  # 1e-3 for chemical accuracy
-    max_ansatz_elements = 600
+    delta_e_threshold = 1e-12  # 1e-3 for chemical accuracy #-12
+    max_ansatz_elements = 600 #600
 
     # <<<<<<<<<<<< DEFINE BACKEND >>>>>>>>>>>>>>>>>
     backend = backends.MatrixCacheBackend
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     use_energy_vector_gradient = True  # for optimizer
 
     # create a vqe_runner object
-    vqe_runner = VQERunner(molecule, backend=backend, optimizer='BFGS', optimizer_options={'gtol': 1e-08},
+    vqe_runner = VQERunner(molecule, backend=backend, optimizer='BFGS', optimizer_options={'gtol': 1e-06},
                            use_ansatz_gradient=use_energy_vector_gradient)
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -84,7 +84,7 @@ if __name__ == "__main__":
                                                    'var_parameters'])
     # <<<<<<<<<<<< LOAD PAUSED SIMULATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     init_db = pandas.read_csv("../../results/iter_vqe_results/H6_iqeb_q_exc_n=1_r=15_no_comps_02-June-2021.csv")
-
+    init_db = None
     if init_db is None:
         ansatz_elements = []
         ansatz_parameters = []
@@ -104,10 +104,9 @@ if __name__ == "__main__":
     print('Exact energy ', exact_energy)
     current_energy = vqe_runner.backend.ham_expectation_value([], [], molecule, global_cache)
 
-    print(current_energy)
+    print(f"current energy: {current_energy}")
     previous_energy = current_energy + max(delta_e_threshold, 1e-5)
     init_ansatz_length = len(ansatz_elements)
-
     while previous_energy - current_energy >= delta_e_threshold and iter_count <= max_ansatz_elements:
         iter_count += 1
 

@@ -127,8 +127,15 @@ class Cache:
         return self.sqr_exc_gen_sparse_matrices_dict[key]
 
     def get_commutator_matrix(self, ansatz_element):
-
+        
         key = str(ansatz_element.excitations_generators)
+        ##MODIFY
+        if self.commutators_sparse_matrices_dict is not None:
+            key = str(ansatz_element.excitations_generators)
+            return self.commutators_sparse_matrices_dict[key]
+        else:
+            exc_gen_matrices_sum = sum(self.exc_gen_sparse_matrices_dict[str(ansatz_element.excitations_generators)])
+            return self.H_sparse_matrix * exc_gen_matrices_sum - exc_gen_matrices_sum * self.H_sparse_matrix
         return self.commutators_sparse_matrices_dict[key]
 
         # # TODO: not tested. used if we do not want to precompute the commutators
