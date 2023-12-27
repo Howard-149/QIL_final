@@ -74,9 +74,9 @@ class VQERunner:
         else:
             assert len(init_guess_parameters) == sum([element.n_var_parameters for element in ansatz])
             var_parameters = init_guess_parameters
-
+        
         LogUtils.vqe_info(self.q_system, self.backend, self.optimizer, ansatz)
-
+        logging.info(sum([element.n_var_parameters for element in ansatz]))
         self.iteration = 1
         self.time_previous_iter = time.time()
 

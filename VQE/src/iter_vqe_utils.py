@@ -228,8 +228,8 @@ class GradientUtils:
 
 class DataUtils:
     @staticmethod
-    def save_data(data_frame, molecule, time_stamp, ansatz_element_type=None, frozen_els=None, iter_vqe_type='iqeb'):
-        filename = '{}_{}_{}_{}_{}.csv'.format(molecule.name, iter_vqe_type, ansatz_element_type, frozen_els, time_stamp)
+    def save_data(data_frame, molecule, optimizer, time_stamp, ansatz_element_type=None, frozen_els=None, iter_vqe_type='iqeb'):
+        filename = '{}_{}_{}_{}_{}.csv'.format(molecule.name, iter_vqe_type, ansatz_element_type, frozen_els , time_stamp)
         try:
             data_frame.to_csv('../../results/iter_vqe_results/'+filename)
         except FileNotFoundError:

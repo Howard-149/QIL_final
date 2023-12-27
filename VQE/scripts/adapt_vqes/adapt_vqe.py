@@ -28,12 +28,12 @@ if __name__ == "__main__":
     r = 1.316
     # theta = 0.538*numpy.pi # for H20
     frozen_els = {'occupied': [], 'unoccupied': []}
-    molecule = BeH2()  # (frozen_els=frozen_els)
+    molecule = HF()  # (frozen_els=frozen_els)
 
     # <<<<<<<<<< ANSATZ ELEMENT POOL PARAMETERS >>>>>>>>>>>>.
-    ansatz_element_type = 'eff_f_exc'
+    # ansatz_element_type = 'eff_f_exc'
     # ansatz_element_type = 'q_exc'
-    # ansatz_element_type = 'f_exc'
+    ansatz_element_type = 'f_exc'
     # ansatz_element_type = 'pauli_str_exc'
     q_encoding = 'jw'
     spin_complement = False  # only for fermionic and qubit excitations (not for PWEs)
@@ -46,10 +46,15 @@ if __name__ == "__main__":
     backend = backends.MatrixCacheBackend
 
     # <<<<<<<<<< DEFINE OPTIMIZER >>>>>>>>>>>>>>>>>
+    OPTIMIZER = 'BFGS'
     use_energy_vector_gradient = True  # for optimizer
 
     # create a vqe_runner object
-    vqe_runner = VQERunner(molecule, backend=backend, optimizer='BFGS', optimizer_options={'gtol': 1e-06},
+    if OPTIMIZER == 'BFGS':
+        vqe_runner = VQERunner(molecule, backend=backend, optimizer=OPTIMIZER, optimizer_options={'gtol': 1e-06},
+                               use_ansatz_gradient=use_energy_vector_gradient)
+    else:
+        vqe_runner = VQERunner(molecule, backend=backend, optimizer=OPTIMIZER, optimizer_options={'maxiter': 500},
                            use_ansatz_gradient=use_energy_vector_gradient)
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -70,8 +75,8 @@ if __name__ == "__main__":
     if backend == backends.MatrixCacheBackend:
         # precompute commutator matrices, that are use in excitation gradient calculation
         global_cache = GlobalCache(molecule)
-        global_cache.calculate_exc_gen_sparse_matrices_dict(ansatz_element_pool)
-        global_cache.calculate_commutators_sparse_matrices_dict(ansatz_element_pool)
+        # global_cache.calculate_exc_gen_sparse_matrices_dict(ansatz_element_pool)
+        # global_cache.calculate_commutators_sparse_matrices_dict(ansatz_element_pool)
     else:
         global_cache = None
 
@@ -79,11 +84,11 @@ if __name__ == "__main__":
     logging.info(message)
 
     # initialize a dataFrame to collect the simulation data
-    results_data_frame = pandas.DataFrame(columns=['n', 'E', 'dE', 'error', 'n_iters', 'cnot_count', 'u1_count',
-                                                   'cnot_depth', 'u1_depth', 'element', 'element_qubits',
-                                                   'var_parameters'])
-    # <<<<<<<<<<<< LOAD PAUSED SIMULATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    init_db = pandas.read_csv("../../results/iter_vqe_results/H6_iqeb_q_exc_n=1_r=15_no_comps_02-June-2021.csv")
+    # results_data_frame = pandas.DataFrame(columns=['n', 'E', 'dE', 'error', 'n_iters', 'cnot_count', 'u1_count',
+    #                                                'cnot_depth', 'u1_depth', 'element', 'element_qubits',
+    #                                                'var_parameters'])
+    # # <<<<<<<<<<<< LOAD PAUSED SIMULATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # init_db = pandas.read_csv("../../results/iter_vqe_results/H6_iqeb_q_exc_n=1_r=15_no_comps_02-June-2021.csv")
     init_db = None
     if init_db is None:
         ansatz_elements = []
@@ -146,7 +151,7 @@ if __name__ == "__main__":
             results_data_frame['var_parameters'] = list(result.x)[init_ansatz_length:]
             # df_data['var_parameters'] = var_parameters
             # save data
-            DataUtils.save_data(results_data_frame, molecule, time_stamp, frozen_els=frozen_els,
+            DataUtils.save_data(results_data_frame, molecule, OPTIMIZER, time_stamp, frozen_els=frozen_els,
                                 ansatz_element_type=ansatz_element_type, iter_vqe_type='adapt')
 
             message = 'Add new element to final ansatz {}. Energy {}. Energy change {}, Grad{}, var. parameters: {}' \
