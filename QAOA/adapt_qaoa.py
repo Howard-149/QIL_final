@@ -121,107 +121,109 @@ def real_cost(graph):
     return -1 * c
 
 
-logging.basicConfig(filename='./results/example.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+if __name__ == "__main__":
+    
+    logging.basicConfig(filename='./results/example.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-### Build the graph -----------------------------------------------------------
-# nodes = 5
-# complete_graph = nx.complete_graph(nodes)
-# cycle_graph = nx.cycle_graph(nodes)
-# cycle_graph.add_edge(0, 3)
-# cycle_graph.add_edge(1, 4)
-# cycle_graph.add_edge(2, 5)
+    ### Build the graph -----------------------------------------------------------
+    # nodes = 5
+    # complete_graph = nx.complete_graph(nodes)
+    # cycle_graph = nx.cycle_graph(nodes)
+    # cycle_graph.add_edge(0, 3)
+    # cycle_graph.add_edge(1, 4)
+    # cycle_graph.add_edge(2, 5)
 
-# graph = complete_graph
-# for (u, v) in graph.edges():
-#     graph.edges[u,v]['weight'] = np.random.uniform(0.1, 1.0)
-### ---------------------------------------------------------------------------
+    # graph = complete_graph
+    # for (u, v) in graph.edges():
+    #     graph.edges[u,v]['weight'] = np.random.uniform(0.1, 1.0)
+    ### ---------------------------------------------------------------------------
 
-graph = nx.Graph()
-def set_graph(g):
-    global graph
-    graph = g
+    graph = nx.Graph()
+    def set_graph(g):
+        global graph
+        graph = g
 
-root = tk.Tk()
-app = GraphBuilderApp(root, callback=set_graph)
-root.mainloop()
-
-
-print(graph)
-logging.info(f'graph: {graph}')
-for edge in graph.edges():
-    print(edge, graph.edges[edge]['weight'])
-    logging.info(f'edge {edge}, weight: {graph.edges[edge]["weight"]}')
-
-### show the cost homiltonian -------------------------------------------------
-# bc = cirq.Circuit()
-# qubits = [cirq.GridQubit(0, i) for i in range(len(graph.nodes()))]
-# print("qubits", qubits)
-# for q in qubits:
-#     bc += cirq.H(q)
-# bc = cost_hamiltonian(bc, qubits, graph, sympy.symbols("alpha0"))
-# print(bc)
-### ---------------------------------------------------------------------------
+    root = tk.Tk()
+    app = GraphBuilderApp(root, callback=set_graph)
+    root.mainloop()
 
 
-solution = real_cost(graph)
-print("real cost", solution)
-logging.info(f'real cost: {solution}')
-max_p = 10
+    print(graph)
+    logging.info(f'graph: {graph}')
+    for edge in graph.edges():
+        print(edge, graph.edges[edge]['weight'])
+        logging.info(f'edge {edge}, weight: {graph.edges[edge]["weight"]}')
 
-single_qubit_pool = s_pool(graph)
-multi_qubit_pool = m_pool(graph)
-
-qaoa_energies = []
-ps = []
-
-### Single qubit QAOA
-adapt_single, adapt_single_depth = adapt_qaoa(graph, single_qubit_pool, max_p)
-adapt_single = [i - solution for i in adapt_single]
-logging.info(f"error: {adapt_single}")
-logging.info(f"depth: {adapt_single_depth}")
-### ---------------------------------------------------------------------------
-
-### Double qubit QAOA
-adapt_multi, adapt_multi_depth = adapt_qaoa(graph, multi_qubit_pool, max_p)
-adapt_multi = [i - solution for i in adapt_multi]
-logging.info(f"error: {adapt_multi}")
-logging.info(f"depth: {adapt_multi_depth}")
-### ---------------------------------------------------------------------------
-
-### Traditional QAOA 
-for p in range(1, max_p + 1):
-    logging.info(f'iteration: {p-1}')
-    e = train_qaoa(make_qaoa(graph, p))
-    print(p, e)
-    logging.info(f'iteration: {p-1}, energy: {e}')
-    qaoa_energies.append(e - solution)
-    ps.append(p)
-### ---------------------------------------------------------------------------
+    ### show the cost homiltonian -------------------------------------------------
+    # bc = cirq.Circuit()
+    # qubits = [cirq.GridQubit(0, i) for i in range(len(graph.nodes()))]
+    # print("qubits", qubits)
+    # for q in qubits:
+    #     bc += cirq.H(q)
+    # bc = cost_hamiltonian(bc, qubits, graph, sympy.symbols("alpha0"))
+    # print(bc)
+    ### ---------------------------------------------------------------------------
 
 
-### Draw
-experments = {
-    'QAOA':qaoa_energies,
-    'ADAPT-single-QAOA': adapt_single,
-    'ADAPT-double-QAOA':adapt_multi
-}
+    solution = real_cost(graph)
+    print("real cost", solution)
+    logging.info(f'real cost: {solution}')
+    max_p = 10
 
-for name, y in experments.items():
-    plt.semilogy(ps, y, marker='o', linestyle='-', label=name)
+    single_qubit_pool = s_pool(graph)
+    multi_qubit_pool = m_pool(graph)
 
-plt.xlabel('iteration')
-plt.ylabel('QAOA Energy Error(log scale)')
-plt.legend()
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)  # Add a grid with dashed lines
+    qaoa_energies = []
+    ps = []
 
-# Adjust the appearance of the legend
-legend = plt.legend()
-legend.get_frame().set_linewidth(0.7)
+    ### Single qubit QAOA
+    adapt_single, adapt_single_depth = adapt_qaoa(graph, single_qubit_pool, max_p)
+    adapt_single = [i - solution for i in adapt_single]
+    logging.info(f"error: {adapt_single}")
+    logging.info(f"depth: {adapt_single_depth}")
+    ### ---------------------------------------------------------------------------
 
-# Customize the appearance of the plot
-plt.tight_layout()  # Adjust layout for better appearance
+    ### Double qubit QAOA
+    adapt_multi, adapt_multi_depth = adapt_qaoa(graph, multi_qubit_pool, max_p)
+    adapt_multi = [i - solution for i in adapt_multi]
+    logging.info(f"error: {adapt_multi}")
+    logging.info(f"depth: {adapt_multi_depth}")
+    ### ---------------------------------------------------------------------------
 
-# Save the figure as an image (optional)
-plt.savefig('./results/example.png', dpi=300, bbox_inches='tight')
+    ### Traditional QAOA 
+    for p in range(1, max_p + 1):
+        logging.info(f'iteration: {p-1}')
+        e = train_qaoa(make_qaoa(graph, p))
+        print(p, e)
+        logging.info(f'iteration: {p-1}, energy: {e}')
+        qaoa_energies.append(e - solution)
+        ps.append(p)
+    ### ---------------------------------------------------------------------------
 
-plt.show()
+
+    ### Draw
+    experments = {
+        'QAOA':qaoa_energies,
+        'ADAPT-single-QAOA': adapt_single,
+        'ADAPT-double-QAOA':adapt_multi
+    }
+
+    for name, y in experments.items():
+        plt.semilogy(ps, y, marker='o', linestyle='-', label=name)
+
+    plt.xlabel('iteration')
+    plt.ylabel('QAOA Energy Error(log scale)')
+    plt.legend()
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)  # Add a grid with dashed lines
+
+    # Adjust the appearance of the legend
+    legend = plt.legend()
+    legend.get_frame().set_linewidth(0.7)
+
+    # Customize the appearance of the plot
+    plt.tight_layout()  # Adjust layout for better appearance
+
+    # Save the figure as an image (optional)
+    plt.savefig('./results/example.png', dpi=300, bbox_inches='tight')
+
+    plt.show()
