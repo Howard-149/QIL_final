@@ -8,8 +8,6 @@ import datetime
 
 import sys
 import ast
-# sys.path.append('../../')
-# sys.path.append('/Users/whylin/com_final/VQE')
 
 from src.vqe_runner import VQERunner
 from src.q_systems import *
