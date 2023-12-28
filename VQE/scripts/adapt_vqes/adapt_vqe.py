@@ -73,8 +73,8 @@ if __name__ == "__main__":
     if backend == backends.MatrixCacheBackend:
         # precompute commutator matrices, that are use in excitation gradient calculation
         global_cache = GlobalCache(molecule)
-        # global_cache.calculate_exc_gen_sparse_matrices_dict(ansatz_element_pool)
-        # global_cache.calculate_commutators_sparse_matrices_dict(ansatz_element_pool)
+        global_cache.calculate_exc_gen_sparse_matrices_dict(ansatz_element_pool)
+        global_cache.calculate_commutators_sparse_matrices_dict(ansatz_element_pool)
     else:
         global_cache = None
 
