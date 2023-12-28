@@ -10,10 +10,9 @@ def cc(qubits, g):
 def cost_hamiltonian(c, qubits, graph, ps):
     h = cc(qubits, graph)
     circuits = generate_circuits(c, [h], ps)
-    c += circuits[0]
-    return c
+    return circuits[0]
 
-def cost_hamiltonian_original(c, qubits, g, ps):
+def cost_hamiltonian_binary(c, qubits, g, ps):
     for edge in g.edges():
         c += cirq.CNOT(qubits[edge[0]], qubits[edge[1]])
         c += cirq.rz(ps).on(qubits[edge[1]])
