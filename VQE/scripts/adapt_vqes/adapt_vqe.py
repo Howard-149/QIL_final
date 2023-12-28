@@ -82,9 +82,9 @@ if __name__ == "__main__":
     logging.info(message)
 
     # initialize a dataFrame to collect the simulation data
-    # results_data_frame = pandas.DataFrame(columns=['n', 'E', 'dE', 'error', 'n_iters', 'cnot_count', 'u1_count',
-    #                                                'cnot_depth', 'u1_depth', 'element', 'element_qubits',
-    #                                                'var_parameters'])
+    results_data_frame = pandas.DataFrame(columns=['n', 'E', 'dE', 'error', 'n_iters', 'cnot_count', 'u1_count',
+                                                   'cnot_depth', 'u1_depth', 'element', 'element_qubits',
+                                                   'var_parameters'])
     # # <<<<<<<<<<<< LOAD PAUSED SIMULATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # init_db = pandas.read_csv("../../results/iter_vqe_results/H6_iqeb_q_exc_n=1_r=15_no_comps_02-June-2021.csv")
     init_db = None
