@@ -1,9 +1,9 @@
 import pyscf
 
 def calculate_ground_state_energy():
-    # Define the molecule
-    atom_symbols = ['Be', 'H', 'H']
-    atom_coordinates = [[0, 0, 0], [0, 0, 1.3], [0, 0, -1.3]]
+    # Define the molecule (HF)
+    atom_symbols = ['H', 'F']
+    atom_coordinates = [[0, 0, 0], [0, 0, 0.917]]
     molecule = pyscf.gto.Mole()
     molecule.atom = list(zip(atom_symbols, atom_coordinates))
     molecule.basis = 'sto-3g'
@@ -16,6 +16,6 @@ def calculate_ground_state_energy():
 
     return ground_state_energy
 
-# Call the function to calculate the ground state energy
+# Call the function to calculate the ground state energy for HF using HF
 energy = calculate_ground_state_energy()
-print("Ground state energy:", energy)
+print("Hartree-Fock Ground state energy for HF:", energy)
