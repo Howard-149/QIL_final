@@ -1,3 +1,4 @@
+import logging
 import tensorflow as tf
 import tensorflow_quantum as tfq
 import cirq
@@ -25,6 +26,10 @@ def make_qaoa(graph, p):
     qs = [cirq.GridQubit(0, i) for i in range(len(graph.nodes()))]
     qaoa_circuit = make_circuit(p, graph, qs)
     
+    depth = len(cirq.Circuit(qaoa_circuit.all_operations()))
+    print(depth)
+    logging.info(f'iteration: {p-1}, depth: {depth}')
+
     cost = cc(qs, graph)
     ins = tf.keras.layers.Input(shape=(), dtype=tf.dtypes.string)
     outs = tfq.layers.PQC(qaoa_circuit, cost, differentiator=tfq.differentiators.Adjoint())(ins)

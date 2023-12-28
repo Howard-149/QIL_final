@@ -12,7 +12,7 @@ import time
 import numpy
 import pandas
 import datetime
-import qiskit
+# import qiskit
 
 
 if __name__ == "__main__":
